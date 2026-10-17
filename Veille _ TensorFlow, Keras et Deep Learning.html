@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Veille : TensorFlow, Keras et Deep Learning</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f5f9;--surface:#fff;--ink:#12203a;--mute:#5a6781;--line:#d5dce8;--tf:#e8590c;--pt:#c2255c;--ok:#0b7a5a;--cell:#dbe7f7;--cellon:#1c4fd1;--code:#0f1b33;--codeink:#dce6ff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1526;--surface:#16213a;--ink:#e6ecfa;--mute:#98a6c4;--line:#2a3857;--tf:#ff8a3d;--pt:#ff6b9a;--ok:#4fd1a1;--cell:#25365c;--cellon:#6c93ff;--code:#080f1d;--codeink:#dce6ff}}
+:root[data-theme="dark"]{--bg:#0d1526;--surface:#16213a;--ink:#e6ecfa;--mute:#98a6c4;--line:#2a3857;--tf:#ff8a3d;--pt:#ff6b9a;--ok:#4fd1a1;--cell:#25365c;--cellon:#6c93ff;--code:#080f1d;--codeink:#dce6ff}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.65 "Source Serif 4",Georgia,serif}
+h1,h2,h3,button,.tag{font-family:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif}
+code,pre,.mono{font-family:"JetBrains Mono",Consolas,monospace}
+main{max-width:920px;margin:0 auto;padding:0 20px 80px}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:4px;overflow-x:auto;padding:8px 12px}
+nav a{white-space:nowrap;font:600 14px "Bricolage Grotesque",sans-serif;color:var(--mute);text-decoration:none;padding:6px 12px;border-radius:99px}
+nav a:hover{background:var(--surface);color:var(--ink)}
+.hero{padding:56px 0 24px}
+.hero h1{font-size:clamp(34px,7vw,64px);line-height:1.02;margin:0 0 16px;font-weight:800;letter-spacing:-.02em}
+.hero p{max-width:60ch;color:var(--mute);font-size:19px;margin:0}
+.heroT{display:flex;gap:6px;margin:28px 0 0;flex-wrap:wrap}
+.heroT i{width:22px;height:22px;border-radius:5px;background:var(--cellon);opacity:.25;animation:pulse 2.4s infinite}
+@keyframes pulse{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+section{padding:48px 0 8px;border-top:1px solid var(--line);margin-top:48px}
+section:first-of-type{border-top:0}
+h2{font-size:clamp(26px,4vw,36px);line-height:1.12;margin:0 0 12px;letter-spacing:-.01em}
+h3{font-size:19px;margin:24px 0 8px}
+.lead{max-width:62ch;margin:0 0 20px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;margin:18px 0}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+button{cursor:pointer;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-weight:600;font-size:15px;padding:8px 14px;border-radius:10px}
+button:hover{border-color:var(--cellon)}
+button.on{background:var(--cellon);border-color:var(--cellon);color:#fff}
+button.go{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--cellon);outline-offset:2px}
+pre{background:var(--code);color:var(--codeink);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13.5px;line-height:1.6;margin:12px 0 0}
+code{font-size:.9em}
+.mute{color:var(--mute)}
+.tag{display:inline-block;font-size:13px;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--cell);color:var(--ink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}}
+/* tenseurs */
+#tview{display:flex;gap:18px;flex-wrap:wrap;min-height:120px;align-items:flex-start}
+.mat{display:grid;gap:4px}
+.c{width:36px;height:36px;border-radius:7px;background:var(--cellon);color:#fff;font:600 13px "JetBrains Mono",monospace;display:grid;place-items:center;transition:all .4s}
+.mat.l{padding:8px;border:1.5px dashed var(--line);border-radius:10px}
+.info{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:15px}
+.info b{font-family:"JetBrains Mono",monospace}
+/* réseau */
+.net{display:flex;justify-content:space-between;gap:6px;align-items:center;overflow-x:auto;padding:6px 0}
+.layer{flex:1;min-width:110px;text-align:center;padding:14px 6px;border:1.5px solid var(--line);border-radius:12px;transition:all .3s;background:var(--bg)}
+.layer.hot{background:var(--cellon);color:#fff;border-color:var(--cellon);transform:translateY(-6px)}
+.layer small{display:block;font:500 12px "JetBrains Mono",monospace;opacity:.85;margin-top:4px}
+.arrow{color:var(--mute)}
+input[type=range]{width:200px;accent-color:var(--cellon)}
+/* cpu gpu */
+.chip{display:grid;grid-template-columns:repeat(16,1fr);gap:2px;margin:8px 0}
+.chip i{aspect-ratio:1;background:var(--cell);border-radius:2px;transition:background .15s}
+.chip i.d{background:var(--cellon)}
+.chip.g i.d{background:var(--tf)}
+.prog{font:600 14px "JetBrains Mono",monospace}
+/* sequential/fonctionnelle */
+.stack{display:flex;flex-direction:column;gap:8px;align-items:center;position:relative;padding:4px 44px 4px 4px}
+.stack div.n{width:100%;max-width:240px;text-align:center;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:8px;font:600 14px "JetBrains Mono",monospace}
+.skip{position:absolute;right:6px;top:34px;bottom:34px;width:34px;border:2px solid var(--tf);border-left:0;border-radius:0 16px 16px 0;display:none}
+.skip.show{display:block}
+.skip span{position:absolute;right:-2px;top:50%;font:600 11px "Bricolage Grotesque";color:var(--tf);writing-mode:vertical-rl;transform:translate(130%,-50%)}
+/* tableau */
+table{width:100%;border-collapse:collapse;font-size:15px;display:block;overflow-x:auto}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th.t{color:var(--tf)}th.p{color:var(--pt)}
+.q p{margin:0 0 10px;font-weight:600}
+.q button{display:block;width:100%;text-align:left;margin-bottom:8px}
+.q button.good{background:var(--ok);border-color:var(--ok);color:#fff}
+.q button.bad{background:var(--pt);border-color:var(--pt);color:#fff}
+.fb{min-height:24px;font-size:15px;color:var(--mute)}
+ul.t{padding-left:20px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+@media(max-width:700px){.cards{grid-template-columns:1fr}}
+.card{border:1.5px solid var(--line);border-radius:12px;padding:16px;background:var(--surface);font-size:15.5px;line-height:1.55}
+.card h3{margin:0 0 6px}
+.card p{margin:6px 0 0}
+main{padding-bottom:110px}
+body.deck section,body.deck .hero{display:none;margin-top:0;border-top:0;padding-top:32px}
+body.deck .cur{display:block;animation:slin .35s ease-out}
+@keyframes slin{from{opacity:0;transform:translateX(24px)}}
+.ctl{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--bg);border-top:1px solid var(--line);display:flex;justify-content:center;align-items:center;gap:16px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px))}
+.ctl button:disabled{opacity:.35;cursor:default}
+.ctl .bar{position:absolute;top:-3px;left:0;height:3px;background:var(--cellon);transition:width .3s}
+#cnt{font:600 14px "JetBrains Mono",monospace;min-width:64px;text-align:center}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<nav aria-label="Sections">
+<a href="#tf">TensorFlow</a><a href="#keras">Keras</a><a href="#tenseurs">Tenseurs</a><a href="#api">Sequential / Fonctionnelle</a><a href="#proc">CPU / GPU / TPU</a><a href="#gpu">Course CPU/GPU</a><a href="#pytorch">PyTorch</a><a href="#vs">PyTorch vs TF</a><a href="#quiz">Quiz</a>
+</nav>
+<main>
+<header class="hero">
+<h1>TensorFlow et Keras : la veille qui se manipule</h1>
+<p>Six notions pour construire des modèles de Deep Learning, avec des démos à essayer pendant la réunion. Naviguez avec les flèches du clavier ou les boutons en bas.</p>
+<div class="heroT" aria-hidden="true" id="heroT"></div>
+</header>
+
+<section id="tf">
+<h2>1. TensorFlow et son rôle dans le Deep Learning</h2>
+<p class="lead">TensorFlow est une bibliothèque open source créée par Google pour calculer sur des tenseurs et entraîner des réseaux de neurones. Elle gère trois choses : les calculs (sur CPU, GPU ou TPU), la différentiation automatique (le calcul des gradients pour l’apprentissage) et le déploiement (serveur, mobile avec TF Lite, navigateur avec TF.js).</p>
+<div class="box">
+<div class="row">
+<button class="go" id="send">Envoyer un lot de données</button>
+<label class="mute">Taille du lot : <b id="bv" class="mono">32</b> <input type="range" id="batch" min="1" max="128" value="32"></label>
+</div>
+<div class="net" id="net"></div>
+<p class="mute" style="margin:12px 0 0;font-size:15px">Les données circulent sous forme de tenseurs. Seule la première dimension (le lot) change avec la taille du lot.</p>
+</div>
+</section>
+
+<section id="keras">
+<h2>2. Comment Keras simplifie TensorFlow</h2>
+<p class="lead">Keras est l’API de haut niveau de TensorFlow. Elle remplace la mécanique des poids, des gradients et des boucles par des briques lisibles : <code>Dense</code>, <code>compile</code>, <code>fit</code>. Comparez le même modèle écrit des deux façons.</p>
+<div class="box">
+<div class="row"><button id="kLow" class="on">TensorFlow bas niveau</button><button id="kHigh">Avec Keras</button><span class="tag" id="kCount"></span></div>
+<pre id="kCode"></pre>
+</div>
+</section>
+
+<section id="tenseurs">
+<h2>3. Comprendre les tenseurs</h2>
+<p class="lead">Un tenseur est un tableau de nombres à N dimensions. Son <b>rang</b> est le nombre de dimensions et sa <b>shape</b> la taille de chacune. Ici, les 12 mêmes valeurs sont réorganisées : choisissez une shape et regardez l’ordre des cases.</p>
+<div class="box">
+<div class="row" id="shapes"></div>
+<div id="tview"></div>
+<div class="info"><span>Rang : <b id="irank"></b></span><span>Shape : <b id="ishape"></b></span><span>Éléments : <b>12</b></span></div>
+<pre id="tcode"></pre>
+</div>
+<div class="box">
+<h3 style="margin-top:0">Exemples courants</h3>
+<ul class="t" style="margin:0">
+<li><b>Scalaire</b>, rang 0 : une perte, un taux d’apprentissage.</li>
+<li><b>Vecteur</b>, rang 1 : les 10 probabilités en sortie d’un classifieur.</li>
+<li><b>Matrice</b>, rang 2 : un lot de données tabulaires <code>(lot, variables)</code>.</li>
+<li><b>Rang 4</b> : un lot d’images <code>(lot, hauteur, largeur, canaux)</code>.</li>
+</ul>
+</div>
+</section>
+
+<section id="api">
+<h2>4. Sequential et API fonctionnelle</h2>
+<p class="lead"><code>Sequential</code> empile les couches en ligne droite. L’API fonctionnelle traite les couches comme des fonctions et autorise les branches, les entrées multiples et les connexions résiduelles. Essayez d’ajouter un raccourci dans chaque mode.</p>
+<div class="box">
+<div class="row"><button id="mSeq" class="on">Sequential</button><button id="mFun">API fonctionnelle</button><label><input type="checkbox" id="skipChk"> Ajouter une connexion résiduelle</label></div>
+<div class="grid2">
+<div class="stack" id="stack"><div class="skip" id="skip"><span>raccourci</span></div></div>
+<div><pre id="apiCode" style="margin:0"></pre><p class="fb" id="apiFb"></p></div>
+</div>
+</div>
+</section>
+
+<section id="proc">
+<h2>5. CPU, GPU, TPU : c’est quoi ?</h2>
+<p class="lead">Ce sont trois types de processeurs qui exécutent les calculs d’un modèle. Image à retenir : le CPU est un chef cuisinier très polyvalent, le GPU est une brigade de milliers de commis qui épluchent en même temps, et le TPU est une machine conçue uniquement pour éplucher.</p>
+<div class="cards">
+<div class="card"><h3>CPU</h3><b>Central Processing Unit</b><p>Le processeur général de l’ordinateur. Il a quelques cœurs puissants, qui enchaînent des tâches variées.</p><p><b>Utile pour :</b> préparer les données, la logique du programme, les petits modèles.</p></div>
+<div class="card"><h3>GPU</h3><b>Graphics Processing Unit</b><p>D’abord conçu pour l’image et les jeux. Il a des milliers de petits cœurs qui font la même opération en parallèle, idéal pour les multiplications de matrices. Fabricants courants : NVIDIA (avec CUDA) et AMD.</p><p><b>Utile pour :</b> entraîner la plupart des réseaux de neurones.</p></div>
+<div class="card"><h3>TPU</h3><b>Tensor Processing Unit</b><p>Une puce créée par Google spécialement pour les calculs sur tenseurs. Elle est très efficace sur les gros modèles, mais moins flexible qu’un GPU. On l’utilise surtout avec TensorFlow et JAX.</p><p><b>Utile pour :</b> de très gros entraînements, sur Google Cloud ou Google Colab.</p></div>
+</div>
+</section>
+
+<section id="gpu">
+<h2>5. CPU et GPU en action</h2>
+<p class="lead">Un CPU a peu de cœurs, très polyvalents. Un GPU en a des milliers, plus simples, qui font la même opération en parallèle : c’est ce qu’il faut pour multiplier de grosses matrices. Lancez la course : chaque case est un calcul à effectuer.</p>
+<div class="box">
+<div class="row"><button class="go" id="race">Lancer la course</button><span class="mute">(démo simplifiée : 4 cœurs CPU contre 64 cœurs GPU)</span></div>
+<div class="grid2">
+<div><b>CPU</b> <span class="prog" id="cpuP"></span><div class="chip" id="cpu"></div></div>
+<div><b style="color:var(--tf)">GPU</b> <span class="prog" id="gpuP"></span><div class="chip g" id="gpu2"></div></div>
+</div>
+<pre>import tensorflow as tf
+print(tf.config.list_physical_devices("GPU"))   # GPU détectés ?
+
+with tf.device("/GPU:0"):                        # forcer le GPU
+    c = tf.matmul(a, b)</pre>
+<p class="mute" style="font-size:15px;margin-bottom:0">TensorFlow utilise le GPU automatiquement s’il est disponible. Pour de petits modèles, le CPU peut suffire, car le transfert des données vers le GPU a un coût.</p>
+</div>
+</section>
+
+<section id="pytorch">
+<h2>6. C’est quoi PyTorch ?</h2>
+<p class="lead">PyTorch est une bibliothèque open source de Deep Learning, lancée en 2016 par Meta (alors Facebook AI Research) et aujourd’hui gérée par la PyTorch Foundation. Elle est très appréciée en recherche car son code ressemble à du Python ordinaire.</p>
+<div class="cards">
+<div class="card"><h3>Tenseurs</h3><p><code>torch.Tensor</code> ressemble à un tableau NumPy, mais peut tourner sur GPU.</p></div>
+<div class="card"><h3>Autograd</h3><p>Le calcul automatique des gradients : on appelle <code>backward()</code> et PyTorch fait le reste.</p></div>
+<div class="card"><h3>Graphe dynamique</h3><p>Le graphe de calcul se construit pendant l’exécution, donc on peut déboguer avec <code>print</code> ou un débogueur classique.</p></div>
+</div>
+<div class="box">
+<h3 style="margin-top:0">Essayez autograd</h3>
+<div class="row"><label>x = <b id="gx" class="mono">3</b> <input type="range" id="gs" min="-5" max="5" step="0.5" value="3"></label></div>
+<div class="info"><span>y = x² = <b id="gy"></b></span><span>gradient dy/dx = 2x = <b id="gg"></b></span></div>
+<pre id="gcode"></pre>
+</div>
+</section>
+
+<section id="vs">
+<h2>6. PyTorch contre TensorFlow</h2>
+<p class="lead">Les deux frameworks font le même travail. Les différences sont surtout dans le style de code et l’écosystème.</p>
+<div class="box">
+<table>
+<tr><th></th><th class="t">TensorFlow / Keras</th><th class="p">PyTorch</th></tr>
+<tr><td>Origine</td><td>Google</td><td>Meta (aujourd’hui sous la fondation PyTorch)</td></tr>
+<tr><td>Style</td><td><code>compile</code> puis <code>fit</code>, très guidé</td><td>Boucle d’entraînement écrite à la main, très flexible</td></tr>
+<tr><td>Exécution</td><td>Eager par défaut, graphe optimisé avec <code>tf.function</code></td><td>Eager par défaut, <code>torch.compile</code> pour optimiser</td></tr>
+<tr><td>Déploiement</td><td>TF Serving, TF Lite (mobile), TF.js (web)</td><td>TorchServe, ExecuTorch, export ONNX</td></tr>
+<tr><td>Usage typique</td><td>Production, mobile, prototypage rapide</td><td>Recherche et expérimentation</td></tr>
+</table>
+<p class="mute" style="font-size:15px">À noter : Keras 3 fonctionne aussi avec les backends JAX et PyTorch, pas seulement TensorFlow.</p>
+</div>
+<div class="box">
+<div class="row"><button id="vTf" class="on">TensorFlow / Keras</button><button id="vPt">PyTorch</button></div>
+<pre id="vCode"></pre>
+</div>
+</section>
+
+<section id="quiz">
+<h2>Quiz pour l’équipe</h2>
+<p class="lead">Faites-le à voix haute avec vos collègues : chacun répond, puis on compare avec le score affiché.</p>
+<div class="box q" id="qbox"></div>
+</section>
+</main>
+<div class="ctl"><div class="bar" id="bar"></div><button id="prev">Précédent</button><span id="cnt"></span><button id="next" class="go">Suivant</button></div>
+<script>
+const $=s=>document.querySelector(s);
+const mk=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const rm=matchMedia("(prefers-reduced-motion:reduce)").matches;
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* hero */
+for(let i=0;i<36;i++){const d=mk("i");d.style.animationDelay=(i%12*0.15+Math.floor(i/12)*0.4)+"s";$("#heroT").append(d)}
+
+/* 1. réseau */
+const stages=[["Entrée","(lot, 784)"],["Dense 128 + ReLU","(lot, 128)"],["Dense 10 + softmax","(lot, 10)"],["Sortie","10 probabilités"]];
+const net=$("#net");
+function drawNet(){const b=$("#batch").value;net.innerHTML="";stages.forEach((s,i)=>{if(i)net.append(mk("span","arrow","→"));net.append(mk("div","layer","<b>"+s[0]+"</b><small>"+s[1].replace("lot",b)+"</small>"))});$("#bv").textContent=b}
+drawNet();$("#batch").oninput=drawNet;
+$("#send").onclick=async()=>{const L=[...document.querySelectorAll(".layer")];L.forEach(l=>l.classList.remove("hot"));for(const l of L){l.classList.add("hot");await wait(rm?0:450);l.classList.remove("hot")}L[L.length-1].classList.add("hot")};
+
+/* 2. keras */
+const low=`import tensorflow as tf
+
+W1=tf.Variable(tf.random.normal([784,128]))
+b1=tf.Variable(tf.zeros([128]))
+W2=tf.Variable(tf.random.normal([128,10]))
+b2=tf.Variable(tf.zeros([10]))
+opt=tf.optimizers.Adam()
+
+for x,y in dataset:
+    with tf.GradientTape() as tape:
+        h=tf.nn.relu(x@W1+b1)
+        p=tf.nn.softmax(h@W2+b2)
+        loss=tf.reduce_mean(
+          tf.keras.losses.sparse_categorical_crossentropy(y,p))
+    g=tape.gradient(loss,[W1,b1,W2,b2])
+    opt.apply_gradients(zip(g,[W1,b1,W2,b2]))`;
+const high=`from tensorflow import keras
+
+model=keras.Sequential([
+    keras.layers.Dense(128,activation="relu"),
+    keras.layers.Dense(10,activation="softmax"),
+])
+model.compile(optimizer="adam",
+              loss="sparse_categorical_crossentropy",
+              metrics=["accuracy"])
+model.fit(x_train,y_train,epochs=5)`;
+function kShow(l){$("#kCode").textContent=l?low:high;$("#kLow").classList.toggle("on",l);$("#kHigh").classList.toggle("on",!l);$("#kCount").textContent=(l?low:high).split("\n").filter(x=>x.trim()).length+" lignes de code"}
+$("#kLow").onclick=()=>kShow(1);$("#kHigh").onclick=()=>kShow(0);kShow(1);
+
+/* 3. tenseurs */
+const shapes=[[12],[3,4],[4,3],[2,6],[2,2,3]];
+let cur=1;
+function drawT(){
+ const s=shapes[cur],v=$("#tview");v.innerHTML="";let n=0;
+ const cell=()=>mk("div","c",n++);
+ const mat=(r,c,cls)=>{const m=mk("div","mat "+(cls||""));m.style.gridTemplateColumns="repeat("+c+",36px)";for(let i=0;i<r*c;i++)m.append(cell());return m};
+ if(s.length==1)v.append(mat(1,s[0]));
+ else if(s.length==2)v.append(mat(s[0],s[1]));
+ else for(let k=0;k<s[0];k++)v.append(mat(s[1],s[2],"l"));
+ $("#irank").textContent=s.length;$("#ishape").textContent="("+s.join(", ")+(s.length==1?",":"")+")";
+ $("#tcode").textContent="t = tf.range(12)\nt = tf.reshape(t, "+($("#ishape").textContent)+")\nprint(t.shape, tf.rank(t).numpy())";
+ [...$("#shapes").children].forEach((b,i)=>b.classList.toggle("on",i==cur));
+}
+shapes.forEach((s,i)=>{const b=mk("button","","("+s.join(", ")+(s.length==1?",":"")+")");b.className="mono";b.onclick=()=>{cur=i;drawT()};$("#shapes").append(b)});
+drawT();
+
+/* 4. sequential / fonctionnelle */
+let mode="seq";
+const layers=["Input(784)","Dense(128)","Dense(128)","Dense(10)"];
+function drawApi(){
+ const st=$("#stack");[...st.querySelectorAll(".n")].forEach(e=>e.remove());
+ layers.forEach(l=>st.append(mk("div","n",l)));
+ const chk=$("#skipChk"),fun=mode=="fun";
+ if(!fun)chk.checked=false;
+ $("#skip").classList.toggle("show",chk.checked&&fun);
+ $("#mSeq").classList.toggle("on",!fun);$("#mFun").classList.toggle("on",fun);
+ $("#apiFb").textContent=(chk.checked&&!fun)?"":"";
+ let code;
+ if(!fun)code=`model = keras.Sequential([
+    keras.Input(shape=(784,)),
+    layers.Dense(128, activation="relu"),
+    layers.Dense(128, activation="relu"),
+    layers.Dense(10, activation="softmax"),
+])`;
+ else code=`inputs = keras.Input(shape=(784,))
+x = layers.Dense(128, activation="relu")(inputs)
+y = layers.Dense(128, activation="relu")(x)
+`+(chk.checked?"y = layers.Add()([x, y])   # raccourci\n":"")+`outputs = layers.Dense(10, activation="softmax")(y)
+model = keras.Model(inputs, outputs)`;
+ $("#apiCode").textContent=code;
+}
+$("#mSeq").onclick=()=>{mode="seq";drawApi()};
+$("#mFun").onclick=()=>{mode="fun";drawApi()};
+$("#skipChk").onchange=e=>{if(mode=="seq"&&e.target.checked){e.target.checked=false;$("#apiFb").textContent="Impossible avec Sequential : une couche n’a qu’une entrée et une sortie. Passez à l’API fonctionnelle.";return}$("#apiFb").textContent="";drawApi();if(e.target.checked)$("#apiFb").textContent="La sortie de la 1re couche est ajoutée à celle de la 2e : c’est le principe des réseaux résiduels (ResNet)."};
+drawApi();
+
+/* 5. cpu / gpu */
+const cp=$("#cpu"),gp=$("#gpu2");
+for(let i=0;i<256;i++){cp.append(mk("i"));gp.append(mk("i"))}
+let busy=false;
+$("#race").onclick=async()=>{
+ if(busy)return;busy=true;
+ const C=[...cp.children],G=[...gp.children];C.concat(G).forEach(x=>x.classList.remove("d"));
+ let c=0,g=0,t=0;$("#cpuP").textContent="";$("#gpuP").textContent="";
+ const tick=rm?1:70;
+ while(c<256||g<256){
+  t++;
+  for(let k=0;k<4&&c<256;k++)C[c++].classList.add("d");
+  for(let k=0;k<64&&g<256;k++)G[g++].classList.add("d");
+  if(c<256)$("#cpuP").textContent="étape "+t;else if(!$("#cpuP").dataset.f)$("#cpuP").textContent="terminé en "+t+" étapes";
+  if(g>=256)$("#gpuP").textContent="terminé en "+Math.ceil(256/64)+" étapes";else $("#gpuP").textContent="étape "+t;
+  await wait(tick);
+ }
+ $("#cpuP").textContent="terminé en "+Math.ceil(256/4)+" étapes";
+ busy=false;
+};
+
+/* 6. pytorch vs tf */
+const vtf=`model = keras.Sequential([
+    layers.Dense(128, activation="relu"),
+    layers.Dense(10),
+])
+model.compile(optimizer="adam",
+    loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True))
+model.fit(x_train, y_train, epochs=5)`;
+const vpt=`model = nn.Sequential(
+    nn.Linear(784, 128), nn.ReLU(),
+    nn.Linear(128, 10),
+)
+opt = torch.optim.Adam(model.parameters())
+loss_fn = nn.CrossEntropyLoss()
+
+for epoch in range(5):
+    for x, y in loader:
+        opt.zero_grad()
+        loss = loss_fn(model(x), y)
+        loss.backward()
+        opt.step()`;
+function vShow(t){$("#vCode").textContent=t?vtf:vpt;$("#vTf").classList.toggle("on",t);$("#vPt").classList.toggle("on",!t)}
+$("#vTf").onclick=()=>vShow(1);$("#vPt").onclick=()=>vShow(0);vShow(1);
+
+/* quiz */
+const Q=[
+["Quelle est la shape d’un lot de 32 images couleur de 64×64 pixels ?",["(32, 64, 64)","(32, 64, 64, 3)","(64, 64, 3)"],1,"Lot, hauteur, largeur, canaux : (32, 64, 64, 3), soit un tenseur de rang 4."],
+["Quelle API Keras permet une connexion résiduelle ?",["Sequential","L’API fonctionnelle","Aucune des deux"],1,"L’API fonctionnelle gère les branches et les fusions de couches."],
+["Pourquoi un GPU accélère-t-il l’entraînement ?",["Il a une horloge plus rapide","Il exécute des milliers d’opérations simples en parallèle","Il a plus de mémoire que le CPU"],1,"Les multiplications de matrices se parallélisent très bien."],
+["Dans PyTorch, quelle ligne calcule les gradients ?",["loss.backward()","opt.step()","model.fit()"],0,"backward() calcule les gradients, puis step() met à jour les poids."],
+["Quelle entreprise a créé TensorFlow ?",["Meta","Google","Microsoft"],1,"Google, qui l’a publié en open source en 2015."],
+["Quel est le rang d’un vecteur ?",["2","0","1"],2,"Un vecteur a une seule dimension, donc un rang de 1."],
+["Quelle méthode Keras lance l’entraînement ?",["model.fit()","model.compile()","model.predict()"],0,"compile() configure l’optimiseur et la perte, fit() entraîne le modèle."],
+["Peut-on remodeler 12 éléments en shape (5, 3) ?",["Oui","Non, car 5×3 = 15, pas 12","Oui, avec du padding automatique"],1,"Un reshape conserve le nombre d’éléments : le produit des dimensions doit rester 12."],
+["Quelle instruction liste les GPU visibles par TensorFlow ?",["tf.config.list_physical_devices('GPU')","tf.gpu.check()","keras.devices()"],0,"list_physical_devices('GPU') renvoie la liste des GPU détectés."],
+["Que produit une couche softmax en sortie ?",["Un gradient","Une perte","Des probabilités dont la somme vaut 1"],2,"Softmax transforme les scores en distribution de probabilités."],
+["Dans quel cas le CPU peut-il suffire ?",["Gros modèle d’images","Petit modèle, peu de données","Jamais"],1,"Pour un petit modèle, le transfert vers le GPU peut coûter plus que le gain."],
+["À quoi sert TF Lite ?",["Déployer des modèles sur mobile","Entraîner sur plusieurs TPU","Visualiser les données"],0,"TF Lite sert à exécuter des modèles sur mobile et appareils embarqués."],
+["Qui a conçu les TPU ?",["NVIDIA","Google","Intel"],1,"Les TPU sont des puces créées par Google pour les calculs sur tenseurs."],
+["Quel composant possède des milliers de petits cœurs travaillant en parallèle ?",["Le CPU","Le disque SSD","Le GPU"],2,"Le GPU est conçu pour exécuter la même opération sur beaucoup de données à la fois."],
+["Quelle entreprise a lancé PyTorch ?",["Meta (Facebook AI Research)","Google","Apple"],0,"PyTorch vient de Facebook AI Research, aujourd’hui Meta, en 2016."],
+["Que signifie « graphe dynamique » dans PyTorch ?",["Le graphe est figé avant l’exécution","Le graphe se construit pendant que le code s’exécute","Le modèle ne peut plus être modifié"],1,"Chaque opération est enregistrée à l’exécution, ce qui facilite le débogage."],
+["Quel module de PyTorch calcule automatiquement les gradients ?",["torch.autograd","torchvision","torch.hub"],0,"autograd enregistre les opérations et calcule les gradients avec backward()."],
+["Où peut-on utiliser un TPU facilement ?",["Dans un tableur","Sur Google Cloud et Google Colab","Uniquement sur mobile"],1,"Les TPU sont proposés via Google Cloud et Google Colab."]
+];
+let qi=0,score=0;
+function qShow(){
+ const b=$("#qbox");b.innerHTML="";
+ if(qi>=Q.length){b.append(mk("p","","Score : "+score+" / "+Q.length));const r=mk("button","go","Recommencer");r.onclick=()=>{qi=0;score=0;qShow()};b.append(r);return}
+ const [q,o,a,e]=Q[qi];
+ b.append(mk("p","","Question "+(qi+1)+" sur "+Q.length+" : "+q));
+ const fb=mk("div","fb");let done=false;
+ o.forEach((t,i)=>{const x=mk("button","",t);x.onclick=()=>{if(done)return;done=true;if(i==a){score++;x.classList.add("good")}else{x.classList.add("bad");b.querySelectorAll("button")[a].classList.add("good")}fb.textContent=e;const n=mk("button","go","Suivant");n.style.width="auto";n.onclick=()=>{qi++;qShow()};b.append(n)};b.append(x)});
+ b.append(fb);
+}
+qShow();
+
+/* demo autograd */
+function gr(){const x=+$("#gs").value;$("#gx").textContent=x;$("#gy").textContent=x*x;$("#gg").textContent=2*x;$("#gcode").textContent="x = torch.tensor("+x.toFixed(1)+", requires_grad=True)\ny = x ** 2\ny.backward()      # autograd calcule dy/dx\nprint(x.grad)     # tensor("+(2*x).toFixed(1)+")"}
+$("#gs").oninput=gr;gr();
+
+/* slides */
+const slides=[document.querySelector(".hero"),...document.querySelectorAll("main section")];
+document.body.classList.add("deck");
+let si=0;
+function go(i){si=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,k)=>s.classList.toggle("cur",k==si));$("#cnt").textContent=(si+1)+" / "+slides.length;$("#prev").disabled=si==0;$("#next").disabled=si==slides.length-1;$("#bar").style.width=((si+1)/slides.length*100)+"%";scrollTo(0,0)}
+$("#prev").onclick=()=>go(si-1);$("#next").onclick=()=>go(si+1);
+document.querySelectorAll("nav a").forEach(a=>a.onclick=e=>{e.preventDefault();go(slides.findIndex(s=>"#"+s.id==a.getAttribute("href")))});
+addEventListener("keydown",e=>{if(e.target.tagName=="INPUT")return;if(e.key=="ArrowRight")go(si+1);if(e.key=="ArrowLeft")go(si-1)});
+go(0);
+</script>
+</body>
+</html>
